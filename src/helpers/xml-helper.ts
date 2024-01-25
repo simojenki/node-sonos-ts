@@ -1,4 +1,4 @@
-import { parse } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 import { encode, decode } from 'html-entities';
 
 export default class XmlHelper {
@@ -14,8 +14,10 @@ export default class XmlHelper {
     if (typeof text !== 'string' || text === '') {
       return undefined;
     }
-
-    return decode(text, { level: 'xml' });
+    console.log(`encoded = ${text}`)
+    const result = decode(text, { level: 'xml' })
+    console.log(`decoded - ${result}`)
+    return result;
   }
 
   /**
@@ -47,7 +49,8 @@ export default class XmlHelper {
   static DecodeAndParseXml(encodedXml: unknown, attributeNamePrefix = '_'): unknown {
     const decoded = XmlHelper.DecodeXml(encodedXml);
     if (typeof decoded === 'undefined') return undefined;
-    return parse(decoded, { ignoreAttributes: false, attributeNamePrefix });
+    console.log(`decoded = ${decoded} -> encodedXml = '${encodedXml}'`);
+    return new XMLParser({ ignoreAttributes: false, attributeNamePrefix }).parse(decoded);
   }
 
   /**
@@ -60,7 +63,7 @@ export default class XmlHelper {
    */
   static DecodeAndParseXmlNoNS(encodedXml: unknown, attributeNamePrefix = '_'): unknown {
     const decoded = XmlHelper.DecodeXml(encodedXml);
-    return decoded ? parse(decoded, { ignoreAttributes: false, ignoreNameSpace: true, attributeNamePrefix }) : undefined;
+    return decoded ? new XMLParser({ ignoreAttributes: false, removeNSPrefix: true, attributeNamePrefix }).parse(decoded) : undefined;
   }
 
   /**

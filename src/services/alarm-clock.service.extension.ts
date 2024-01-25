@@ -26,11 +26,14 @@ export class AlarmClockService extends AlarmClockServiceBase {
     if (alarmList.CurrentAlarmList === undefined || alarmList.CurrentAlarmList === '') {
       return [];
     }
+    console.log(`alarm list = ${alarmList.CurrentAlarmList}`)
     const parsedList = XmlHelper.DecodeAndParseXml(alarmList.CurrentAlarmList, '');
+    console.log(`parsedList = ${JSON.stringify(parsedList)}`)
     const alarms = ArrayHelper.ForceArray<any>((parsedList as any).Alarms.Alarm);
     const results: Array<Alarm> = [];
     alarms.forEach((alarm: any) => {
       if (alarm.ID !== undefined) {
+        console.log(`found an alarm meta data = ${alarm.ProgramMetaData}`)
         results.push({
           Duration: alarm.Duration,
           Enabled: alarm.Enabled === '1',

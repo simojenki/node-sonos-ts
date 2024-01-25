@@ -1,6 +1,6 @@
 import fetch, { Request, Response } from 'node-fetch';
 
-import { parse } from 'fast-xml-parser';
+import { XMLParser } from 'fast-xml-parser';
 import { Guid } from 'guid-typescript';
 import { EventEmitter } from 'events';
 import debug, { Debugger } from 'debug';
@@ -261,7 +261,7 @@ export default abstract class BaseService <TServiceEvent> {
       ? await response.text()
       : await this.handleErrorResponse<string>(action, response);
 
-    const result = parse(responseText);
+    const result = new XMLParser().parse(responseText);
     if (!result || !result['s:Envelope']) {
       this.debug('Invalid response for %s %o', action, result);
       throw new Error(`Invalid response for ${action}: ${result}`);
@@ -281,7 +281,7 @@ export default abstract class BaseService <TServiceEvent> {
   private async handleErrorResponse<TResponse>(action: string, response: Response): Promise<TResponse> {
     const responseText = await response.text();
     if (responseText !== '') {
-      const errorResponse = parse(responseText);
+      const errorResponse = new XMLParser().parse(responseText);
       if (errorResponse['s:Envelope'] && errorResponse['s:Envelope']['s:Body'] && errorResponse['s:Envelope']['s:Body']['s:Fault'] !== undefined) {
         const error = errorResponse['s:Envelope']['s:Body']['s:Fault'];
         this.debug('Sonos error on %s %o', action, error);
@@ -524,7 +524,7 @@ export default abstract class BaseService <TServiceEvent> {
    */
   public ParseEvent(xml: string): void {
     this.debug('Got event');
-    const rawBody = parse(xml, { attributeNamePrefix: '', ignoreNameSpace: true }).propertyset.property;
+    const rawBody = new XMLParser({ attributeNamePrefix: '', removeNSPrefix: true }).parse(xml).propertyset.property;
     this.Events.emit(ServiceEvents.Unprocessed, rawBody);
     if (rawBody.LastChange) {
       const rawEventWrapper = XmlHelper.DecodeAndParseXmlNoNS(rawBody.LastChange, '') as any;

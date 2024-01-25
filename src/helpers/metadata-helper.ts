@@ -89,6 +89,7 @@ export default class MetadataHelper {
     if (track.UpnpClass !== undefined) metadata += `<upnp:class>${track.UpnpClass}</upnp:class>`;
     metadata += `<desc id="cdudn" nameSpace="urn:schemas-rinconnetworks-com:metadata-1-0/">${localCdudn}</desc>`;
     metadata += '</item></DIDL-Lite>';
+    console.log(`metadata = ${metadata}`)
     return metadata;
   }
 
